@@ -1,0 +1,296 @@
+ <html>
+<head>
+<title> Survivor inGame Round 3 </title>
+
+<!-- copy and paste the next 2 lines to setup the sound files, you must modify the loadsoundchrome.js file with your sounds -->
+<script type="text/javascript" src="script/soundmanager2.js"></script>
+<script type="text/javascript" src="script/loadsoundchrome.js"></script>
+<!-- Stop copying here -->
+
+<center>
+	<script type="text/javascript" src="script/processing-1.4.1.js"></script>
+	<script type="text/processing" data-processing-target="mycanvas">
+
+/* @pjs globalKeyEvents = "true";*/
+
+int zombieLife[] = new int [20];
+int stopCount[] = new int [20];
+int zombieDeathsound[] = new int[20];
+int zombieHealth[] = new int[20];
+int zombiePassedCount[] = new int [20];
+int zombieCountt[] = new int [20];
+int zombiex[] = new int [20];
+int zombiey[] = new int [20];
+int moving;
+		
+//player
+PImage player;
+PImage startNormal;
+PImage startHover;
+PImage gunFlash;
+PImage blood;
+PImage roundClear;
+PImage nextRoundn;
+PImage nextRoundh;
+PImage restartn;
+PImage restarth;
+PImage youLose;
+
+int startCounter;
+
+int zombieStart;
+
+int ammo;
+
+void setup()
+{
+size( 640, 480 );
+background(255,0,0);
+frameRate( 30 );   
+
+backgroundMusic = 0;
+
+startCounter = 0;
+
+gamePrep = 0;
+
+zombieCount = 20;
+
+moving = 400;
+
+n = 1;
+
+if (zombieCount >= 1)
+{
+while (n >= 1 && n <= 20)
+	{
+		zombieLife[n] = 1;
+		zombiex[n] = (int)random(50,590);
+		zombiey[n] = (int)random(-700,-20 );
+		stopCount[n] = 0;
+		zombieDeathsound[n] = 0;
+		zombieHealth[n] = 1;
+		zombiePassedCount[n] = 0;
+		zombieCountt[n] = 0;
+		n = n + 1;
+	}
+}
+
+
+//Sound
+	//roundWin
+	stopSound = 0;
+
+	//roundLost
+	sadViolin = 0;
+
+	//ambience
+	startAmbience = 0;
+
+	//mouseFire
+	mouseFire = 0;
+
+	//gunSound
+	gunSound = 0;
+	
+	//ammo
+	ammo = 15;
+
+//Zombies Passed Count
+zombiesPassedCount = 0;
+
+zombieCountFinal = 0;
+
+crosshair = loadImage("images/inGame/crosshair.png");
+spaceStart = loadImage("images/buttons/spaceStart.png");
+zombie = loadImage("images/inGame/characters/CS2d Zombie.png");
+wave1 = loadImage("images/buttons/waves/wave1.png");
+wave2 = loadImage("images/buttons/waves/wave2.png");
+gunFlash = loadImage("images/inGame/gunFlash.png");
+blood = loadImage ("images/inGame/blood.png");
+restartn = loadImage ("images/buttons/restartn.png");
+restarth = loadImage ("images/buttons/restarth.png");
+youLose = loadImage ("images/buttons/youLose.png");
+roundClear = loadImage ("images/inGame/roundClear.png");
+nextRoundn = loadImage ("images/buttons/nextRoundn.png");
+nextRoundh = loadImage ("images/buttons/nextRoundh.png");
+
+noCursor();
+}
+
+void draw()
+{	
+background(0,0,0);
+
+//music
+if (startCounter == 0)
+	{
+		image(spaceStart,10,405,630,60);
+	}
+
+if (keyPressed == true)
+	{
+	if (key == ' ')
+		{
+		//transition from hold to start -> inGame (visually)
+		startCounter = 1;
+		}
+	}
+	
+if (startCounter == 1 && startAmbience == 0)
+	{
+		soundManager.play('s2');
+		startAmbience = 1;
+	}
+
+//zombies moving
+	if (startCounter == 1)
+		{
+		n = 1;
+		while (n >= 1 && n <= 20)
+			{
+			if (zombieLife[n] == 1)
+				{
+					zombiey[n] = zombiey[n] + 2.8;
+					moving = moving - 0.012;
+				}
+			else
+				{
+					zombiey[n] = zombiey[n];
+					moving = moving;
+				}	
+			n = n + 1;
+			}
+		}	
+		
+
+//line
+fill(255,255,255);
+stroke(255,255,255);
+strokeWeight(5);
+line(0,moving,640,moving);
+
+//zombies
+n = 1;
+while (n >= 1 && n <= 20)
+	{
+	image(zombie,zombiex[n],zombiey[n],30,30);
+	if (zombiey[n] > moving)
+		{
+			zombiePassedCount[n] = 1;
+		}
+	n = n + 1;
+	}
+	
+
+fill (255,255,255);
+
+
+//killing first zombie
+n = 1;
+while (n >= 1 && n <= 20)
+	{
+	if (mousePressed == true && mouseButton == LEFT && mouseX > zombiex[n] && mouseX < zombiex[n] + 30
+	&& mouseY > zombiey[n] && mouseY < zombiey[n] + 30 && stopCount[n] == 0 && mouseFire == 0)
+		{
+			zombieLife[n] = 0;
+			zombieCount = zombieCount - 1;
+			stopCount[n] = 1;
+			zombieHealth[n] = 0;
+		}
+	if (zombieLife[n] == 0)
+		{
+			image(blood,zombiex[n]-20,zombiey[n]-10,70,50);
+			if (zombieDeathsound[n] == 0)
+			{
+				soundManager.play('s4');
+				zombieDeathsound[n] = 1;
+			}
+		}
+	n = n + 1;
+	}
+	
+
+
+zombiePassedTotal = zombiePassedCount[1] + zombiePassedCount[2] + zombiePassedCount[3] + 
+zombiePassedCount[4] + zombiePassedCount[5] + zombiePassedCount[6] + 
+zombiePassedCount[7] + zombiePassedCount[8] + zombiePassedCount[9] + 
+zombiePassedCount[10]+ zombiePassedCount[11] + zombiePassedCount[12] + 
+zombiePassedCount[13] + zombiePassedCount[14] + zombiePassedCount[15] + 
+zombiePassedCount[16] + zombiePassedCount[17] + zombiePassedCount[18] + 
+zombiePassedCount[19] + zombiePassedCount[20];
+
+
+
+//round over
+if (zombieCount-zombiePassedTotal == 0 && zombiePassedTotal < 4)
+	{
+	moving = moving + 0.024;
+	image(roundClear,50,50);
+	image(nextRoundn,75,100);
+	if (mouseX > 75 && mouseX < 558 && mouseY > 100 && mouseY < 160)
+		{
+			image(nextRoundh,75,100);
+		}
+	if (mousePressed == true && mouseButton == LEFT && mouseX > 75 && mouseX < 558 
+	&& mouseY > 100 && mouseY < 160)
+		{
+			link("round4.html");
+		}
+		
+	if (stopSound == 0)
+		{
+			soundManager.play('s3');
+			stopSound = 1;
+		}
+	}
+
+
+//round lost
+if (zombiePassedTotal >= 4)
+	{   
+	    moving = moving + 0.024;
+		image(restartn,190,50);
+		image(youLose,170,280);
+		if (sadViolin == 0)
+			{
+				soundManager.play('s6');
+				sadViolin = 1;
+			}
+		if (mouseX > 190 && mouseX < 440 && mouseY > 50 && mouseY < 120)
+			{
+				image(restarth,190,50);
+			}
+		if (mousePressed == true && mouseButton == LEFT && mouseX > 190
+		&& mouseX < 440 && mouseY > 50 && mouseY < 120)
+			{
+				link("round1.html");
+			}
+	}
+
+//Shooting
+image(crosshair,mouseX - 15,mouseY - 15,30,30);
+if (mousePressed == true && mouseButton == LEFT && mouseFire == 0 && gunSound == 0)
+	{
+		image(gunFlash,mouseX - 65,mouseY - 40,140,80);
+		soundManager.play('s5');
+		gunSound = 1;
+		mouseFire = 1;
+	}
+if (mousePressed == false && mouseButton == LEFT && mouseFire == 1)
+	{
+		gunSound = 0
+		mouseFire = 0;
+	}
+
+//ZombieCount
+text ("Zombies Failed: ",16,20);
+text(zombiePassedTotal,110,20);
+
+
+
+}
+
+	</script>
+	<canvas id="mycanvas"></canvas>
+</center>

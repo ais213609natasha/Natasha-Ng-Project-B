@@ -1,0 +1,132 @@
+<html>
+<head>
+<title> Survivor Main Menu </title>
+
+<!-- copy and paste the next 2 lines to setup the sound files, you must modify the loadsoundchrome.js file with your sounds -->
+<script type="text/javascript" src="script/soundmanager2.js"></script>
+<script type="text/javascript" src="script/loadsoundchrome.js"></script>
+<!-- Stop copying here -->
+
+<center>
+	<script type="text/javascript" src="script/processing-1.4.1.js"></script>
+	<script type="text/processing" data-processing-target="mycanvas">
+
+int backgroundMusic;
+int menuTransition;
+int mainMenu;
+int n;
+int time;
+int startTime;
+int endTime;
+int x;
+PImage s[] = new PImage [18];
+
+//MainMenuPics
+PImage mainMenu;
+PImage mainMenuSpace;
+
+//Buttons
+PImage playNormal;
+PImage playHover;
+/* @pjs globalKeyEvents = "true"; */
+
+void setup()
+{
+size( 640, 480 );
+frameRate( 30 );   
+
+backgroundMusic = 0;
+menuTransition = 0;
+
+menuBackground = 0;
+
+pressToStartCounter = 0;
+
+mainMenu = loadImage("images/buttons/mainTitle.png");
+mainMenuSpace = loadImage("images/mainMenu/mainMenuSpace.jpg");
+playNormal = loadImage("images/buttons/playNormal.png");
+playHover = loadImage("images/buttons/playHover.png");
+
+	n = 1;
+	while (n <= 18)
+		{
+			s[n] = loadImage ("images/mainMenu/sprites/s"+n+".png");
+			n = n + 1;
+		}
+		
+	time = 0;
+}
+
+void draw()
+{
+background(0,0,0);
+
+image(mainMenuSpace,0,0);
+
+
+	n = 1;
+	startTime = 0;
+	endTime = 5;
+
+
+	while (n <= 18)
+		{
+			if (time >= startTime && time <= endTime)
+				{
+					image (s[n],40,60,150,300);
+				}
+			n = n + 1;
+			startTime = startTime + 5;
+			endTime = endTime + 5;
+		}
+	
+	time = time + 2;
+	
+	if (time >= 90)
+	{
+		time = 0;
+	}
+
+if (menuBackground > 0.9)
+	{
+		image(playNormal,220,385,0,0);
+		if (mouseX > 220 && mouseX < 420 && mouseY > 370 && mouseY < 460)
+			{
+			image(playHover,220,385,0,0);
+			if (mousePressed == true && mouseButton == LEFT)
+				{
+					link("CharacterSelect.html");
+				}
+			}
+	}
+
+				//transition from hold to start -> main menu (visual)
+				menuTransition = menuTransition + 1;
+				if (menuTransition < 1.1 && menuTransition > 0.9)
+					{
+						menuTransition = 2;
+					}
+				if (menuTransition < 1)
+					{
+						menuBackground = 0;
+					}
+				if (menuTransition == 2)
+					{
+						menuBackground = 1;
+					}
+				//transition from hold to start -> main menu (audio)
+				backgroundMusic = backgroundMusic + 1;
+				if (backgroundMusic < 1.1 && backgroundMusic > 0.9)
+					{
+						backgroundMusic = 2;
+					}
+				if (backgroundMusic == 2)
+					{
+						//main menu soundtrack
+						soundManager.play('s0');
+					}
+}
+
+	</script>
+	<canvas id="mycanvas"></canvas>
+</center>
